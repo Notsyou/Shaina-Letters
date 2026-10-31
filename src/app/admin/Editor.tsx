@@ -8,7 +8,7 @@ import StarterKit from "@tiptap/starter-kit";
 import TextAlign from "@tiptap/extension-text-align";
 import { TextStyleKit } from "@tiptap/extension-text-style";
 import Image from "@tiptap/extension-image";
-import { deleteLetter, saveLetter } from "./actions";
+import { autosaveLetter, deleteLetter, saveLetter } from "./actions";
 import { SEALS } from "@/lib/constants";
 import { SealEmblem } from "@/components/Envelope";
 
@@ -35,6 +35,33 @@ function toLocalInput(iso: string) {
   const d = new Date(iso);
   const off = d.getTimezoneOffset() * 60000;
   return new Date(d.getTime() - off).toISOString().slice(0, 16);
+}
+
+type Backup = { title: string; content: string; seal: string; release: string; at: number };
+type AutoStatus =
+  | { kind: "idle" }
+  | { kind: "saving" }
+  | { kind: "saved"; at: string }
+  | { kind: "device" }
+  | { kind: "released" }
+  | { kind: "signed-out" };
+
+const backupKey = (id: number | undefined) => `sl-letter-backup:${id ?? "new"}`;
+const sig = (title: string, content: string, seal: string) => JSON.stringify([title.trim(), content, seal]);
+
+function AutosaveStatus({ status }: { status: AutoStatus }) {
+  const text = (() => {
+    switch (status.kind) {
+      case "saving": return "Saving…";
+      case "saved": return `✓ Autosaved ${new Date(status.at).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })}`;
+      case "device": return "⚠ Can't reach the server. Saved on this device. Keep this page open, it'll retry as you type.";
+      case "released": return "Shai can already read this letter, so changes are only kept on this device until you press Save.";
+      case "signed-out": return "⚠ You're logged out. Your writing is saved on this device. Log in again in another tab, then come back and press Save.";
+      default: return "Autosave is on";
+    }
+  })();
+  const warn = status.kind === "device" || status.kind === "signed-out" || status.kind === "released";
+  return <div className={`autosave-status${warn ? " warn" : ""}`} aria-live="polite">{text}</div>;
 }
 
 function Toolbar({ editor, onUpload, uploading }: { editor: TEditor; onUpload: (f: File) => void; uploading: boolean }) {
@@ -118,6 +145,18 @@ export default function Editor(props: Props) {
   const [pending, start] = useTransition();
   const dirty = useRef(false);
 
+  // ── Autosave ──────────────────────────────────────────────
+  // 1) every change is backed up in this browser (localStorage) within ~0.3s
+  // 2) ~2s after typing stops it's saved to the server (as a draft for new letters)
+  const idRef = useRef<number | undefined>(props.id);
+  const [letterId, setLetterId] = useState<number | undefined>(props.id);
+  const [tick, setTick] = useState(0);
+  const [status, setStatus] = useState<AutoStatus>({ kind: "idle" });
+  const [restore, setRestore] = useState<Backup | null>(null);
+  const serverSig = useRef(sig(props.title, props.content, props.seal ?? "S"));
+  const queue = useRef<Promise<void>>(Promise.resolve());
+  const changed = () => { dirty.current = true; setTick((t) => t + 1); };
+
   useEffect(() => setRelease(toLocalInput(props.releaseAt)), [props.releaseAt]);
 
   const editor = useEditor({
@@ -132,18 +171,120 @@ export default function Editor(props: Props) {
     content: props.content,
     editorProps: { attributes: { class: "letter-body" } },
     onUpdate: () => {
-      dirty.current = true;
       setMsg(null);
+      changed();
     },
   });
 
+  const snapshot = (): Backup | null =>
+    editor ? { title, content: editor.getHTML(), seal, release, at: Date.now() } : null;
+
+  function writeBackup() {
+    const snap = snapshot();
+    if (!snap) return;
+    try {
+      localStorage.setItem(backupKey(idRef.current), JSON.stringify(snap));
+    } catch {}
+  }
+
+  function clearBackupIfSynced() {
+    const snap = snapshot();
+    if (snap && sig(snap.title, snap.content, snap.seal) === serverSig.current) {
+      try { localStorage.removeItem(backupKey(idRef.current)); } catch {}
+      dirty.current = false;
+    }
+  }
+
+  function runAutosave() {
+    queue.current = queue.current.then(async () => {
+      const snap = snapshot();
+      if (!snap) return;
+      const s = sig(snap.title, snap.content, snap.seal);
+      if (s === serverSig.current) return;
+      setStatus({ kind: "saving" });
+      try {
+        const res = await autosaveLetter({
+          id: idRef.current,
+          title: snap.title,
+          content: snap.content,
+          seal: snap.seal,
+          releaseAt: snap.release ? new Date(snap.release).toISOString() : "",
+        });
+        if (res.error === "signed-out") return setStatus({ kind: "signed-out" });
+        if (res.error) return setStatus({ kind: "device" });
+        if (res.skipped === "released") return setStatus({ kind: "released" });
+        if (res.skipped === "empty") return setStatus({ kind: "idle" });
+        if (!idRef.current && res.id) {
+          // New letter just became a draft: move its backup and update the address bar (no reload).
+          try { localStorage.removeItem(backupKey(undefined)); } catch {}
+          idRef.current = res.id;
+          setLetterId(res.id);
+          window.history.replaceState(null, "", `/admin/letters/${res.id}`);
+        }
+        serverSig.current = s;
+        setStatus({ kind: "saved", at: res.savedAt ?? new Date().toISOString() });
+        writeBackup();
+        clearBackupIfSynced();
+      } catch {
+        // offline or server unreachable: the device backup still has it
+        setStatus({ kind: "device" });
+      }
+    });
+  }
+
+  // On every change: quick device backup, then a debounced server save.
   useEffect(() => {
-    const warn = (e: BeforeUnloadEvent) => {
-      if (dirty.current) e.preventDefault();
-    };
+    if (tick === 0) return;
+    const t1 = setTimeout(writeBackup, 300);
+    const t2 = setTimeout(runAutosave, 2000);
+    return () => { clearTimeout(t1); clearTimeout(t2); };
+  }, [tick]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Phones can kill a backgrounded tab without warning, so back up immediately when the page is hidden.
+  useEffect(() => {
+    const flush = () => { if (dirty.current) { writeBackup(); runAutosave(); } };
+    const onHide = () => { if (document.visibilityState === "hidden") flush(); };
+    const warn = (e: BeforeUnloadEvent) => { flush(); if (dirty.current) e.preventDefault(); };
+    document.addEventListener("visibilitychange", onHide);
+    window.addEventListener("pagehide", flush);
     window.addEventListener("beforeunload", warn);
-    return () => window.removeEventListener("beforeunload", warn);
-  }, []);
+    return () => {
+      document.removeEventListener("visibilitychange", onHide);
+      window.removeEventListener("pagehide", flush);
+      window.removeEventListener("beforeunload", warn);
+    };
+  }); // re-bind each render so the handlers see the latest text
+
+  // On open: offer to restore anything on this device that never reached the server.
+  useEffect(() => {
+    if (!editor) return;
+    try {
+      const raw = localStorage.getItem(backupKey(props.id));
+      if (!raw) return;
+      const b = JSON.parse(raw) as Backup;
+      const empty = !b.title.trim() && !b.content.replace(/<[^>]*>/g, "").trim();
+      if (empty || sig(b.title, b.content, b.seal) === serverSig.current) {
+        localStorage.removeItem(backupKey(props.id));
+        return;
+      }
+      setRestore(b);
+    } catch {}
+  }, [editor]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  function applyRestore() {
+    if (!restore || !editor) return;
+    setTitle(restore.title);
+    setSeal(restore.seal);
+    if (restore.release) setRelease(restore.release);
+    editor.commands.setContent(restore.content);
+    setRestore(null);
+    changed();
+  }
+
+  function discardRestore() {
+    try { localStorage.removeItem(backupKey(idRef.current)); } catch {}
+    setRestore(null);
+  }
 
   async function upload(file: File) {
     if (!editor) return;
@@ -167,9 +308,14 @@ export default function Editor(props: Props) {
     if (!editor) return;
     const releaseAt = releaseNow ? new Date().toISOString() : release ? new Date(release).toISOString() : "";
     start(async () => {
-      const res = await saveLetter({ id: props.id, title, content: editor.getHTML(), releaseAt, isDraft, seal });
+      await queue.current; // let any background save finish first (it may have created the draft)
+      const content = editor.getHTML();
+      const res = await saveLetter({ id: idRef.current, title, content, releaseAt, isDraft, seal });
       if (res.error) return setMsg(res.error);
-      dirty.current = false;
+      if (res.id) { idRef.current = res.id; setLetterId(res.id); }
+      serverSig.current = sig(title, content, seal);
+      setStatus({ kind: "saved", at: new Date().toISOString() });
+      clearBackupIfSynced();
       if (releaseNow) setRelease(toLocalInput(releaseAt));
       const when = new Date(releaseAt);
       setMsg(isDraft ? "Draft saved ✓" : when > new Date() ? `Scheduled ✓ unlocks ${when.toLocaleString()}` : "Released ✓ Shai can read it now");
@@ -182,14 +328,25 @@ export default function Editor(props: Props) {
 
   return (
     <div className="editor-grid">
+      {restore && (
+        <div className="restore-banner" role="alert">
+          <span>
+            <strong>Unsaved writing found on this device</strong> from {new Date(restore.at).toLocaleString()}.
+          </span>
+          <span className="restore-actions">
+            <button className="btn-wax" type="button" onClick={applyRestore}>Restore it</button>
+            <button className="btn-plain" type="button" onClick={discardRestore}>Discard</button>
+          </span>
+        </div>
+      )}
       <div className="editor-meta">
         <label className="field" style={{ margin: 0 }}>
           <span>Title (Shai sees it once the letter unlocks)</span>
-          <input className="input-box" value={title} onChange={(e) => { setTitle(e.target.value); dirty.current = true; }} placeholder="e.g. For your birthday" maxLength={200} />
+          <input className="input-box" value={title} onChange={(e) => { setTitle(e.target.value); changed(); }} placeholder="e.g. For your birthday" maxLength={200} />
         </label>
         <label className="field" style={{ margin: 0 }}>
           <span>Unlocks at (your time)</span>
-          <input className="input-box" type="datetime-local" value={release} onChange={(e) => { setRelease(e.target.value); dirty.current = true; }} />
+          <input className="input-box" type="datetime-local" value={release} onChange={(e) => { setRelease(e.target.value); changed(); }} />
         </label>
       </div>
 
@@ -204,7 +361,7 @@ export default function Editor(props: Props) {
               aria-checked={seal === s.id}
               title={s.label}
               className={`seal-option${seal === s.id ? " on" : ""}`}
-              onClick={() => { setSeal(s.id); dirty.current = true; }}
+              onClick={() => { setSeal(s.id); changed(); }}
             >
               <span className="seal mini"><SealEmblem emblem={s.id} /></span>
             </button>
@@ -214,6 +371,7 @@ export default function Editor(props: Props) {
       </div>
 
       <div>
+        <AutosaveStatus status={status} />
         {editor && <Toolbar editor={editor} onUpload={upload} uploading={uploading} />}
         <div className="editor-surface">
           <div className="letter-paper">
@@ -234,9 +392,9 @@ export default function Editor(props: Props) {
           {msg && <span className="form-msg">{msg}</span>}
         </div>
         <div className="right">
-          {props.id && (
+          {letterId && (
             <>
-              <Link className="btn-plain" href={`/letter/${props.id}`} target="_blank">Preview ↗</Link>
+              <Link className="btn-plain" href={`/letter/${letterId}`} target="_blank">Preview ↗</Link>
               <button
                 className="btn-danger"
                 type="button"
@@ -244,7 +402,8 @@ export default function Editor(props: Props) {
                 onClick={() => {
                   if (confirm("Delete this letter forever? Her reactions and replies to it will be deleted too.")) {
                     dirty.current = false;
-                    start(() => deleteLetter(props.id!));
+                    try { localStorage.removeItem(backupKey(letterId)); } catch {}
+                    start(() => deleteLetter(letterId));
                   }
                 }}
               >

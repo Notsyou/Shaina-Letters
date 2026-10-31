@@ -9,7 +9,7 @@ export default async function NewLetter() {
   return (
     <main className="admin">
       <AdminBar title="A new letter" />
-      <Editor title="" content="" releaseAt={tomorrow.toISOString()} isDraft />
+      <Editor key={crypto.randomUUID()} title="" content="" releaseAt={tomorrow.toISOString()} isDraft />
     </main>
   );
 }
