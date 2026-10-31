@@ -63,6 +63,14 @@ export async function deleteLetter(id: number) {
   redirect("/admin");
 }
 
+/** Mark a letter as unopened again: Shai sees it sealed with the "new" ribbon, and her next open triggers the email again. */
+export async function resealLetter(id: number) {
+  await requireAdmin();
+  const db = await getDb();
+  await db.update(letters).set({ firstOpenedAt: null }).where(eq(letters.id, id));
+  revalidatePath("/", "layout");
+}
+
 export async function markReplySeen(id: number) {
   await requireAdmin();
   const db = await getDb();
