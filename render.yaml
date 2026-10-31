@@ -1,0 +1,35 @@
+services:
+  - type: web
+    name: shais-letters
+    runtime: node
+    plan: free
+    buildCommand: npm ci && npm run build
+    startCommand: npm start
+    healthCheckPath: /login
+    envVars:
+      - key: NODE_VERSION
+        value: "22"
+      - key: NEXT_TELEMETRY_DISABLED
+        value: "1"
+      - key: TIMEZONE
+        value: Asia/Manila
+      - key: GMAIL_USER
+        value: notzyou1@gmail.com
+      - key: ADMIN_EMAIL
+        value: notzyou1@gmail.com
+      - key: SESSION_SECRET
+        generateValue: true
+      - key: CRON_SECRET
+        generateValue: true
+      - key: READER_PASSWORD
+        sync: false
+      - key: ADMIN_PASSWORD
+        sync: false
+      - key: DATABASE_URL
+        sync: false
+      - key: GMAIL_APP_PASSWORD
+        sync: false
+      - key: CLOUDINARY_URL
+        sync: false
+      - key: SITE_URL
+        sync: false
