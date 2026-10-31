@@ -42,6 +42,8 @@ const MIGRATIONS: string[] = [
     notify_released BOOLEAN NOT NULL DEFAULT FALSE
   );
   `,
+  // 1: per-letter wax-seal stamp
+  `ALTER TABLE letters ADD COLUMN IF NOT EXISTS seal TEXT NOT NULL DEFAULT 'S';`,
 ];
 
 type RawExec = (sql: string) => Promise<unknown>;

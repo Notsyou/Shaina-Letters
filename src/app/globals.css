@@ -440,3 +440,24 @@ button { font: inherit; color: inherit; }
 .admin-theme .past-reply { background: #fafafa; border-left-color: #111; box-shadow: none; border: 1px solid #e6e6e6; border-left: 3px solid #111; }
 .admin-theme .past-reply .body { font-family: var(--font-serif); font-size: 1.05rem; line-height: 1.55; }
 .admin-theme .seal { filter: grayscale(1); }
+
+/* ───────── Seal stamps (emoji pressed into wax) ───────── */
+.seal .emblem.icon {
+  font-size: 40cqw;
+  filter: grayscale(1) contrast(1.6) brightness(0.75) drop-shadow(0 1px 0 rgba(255, 220, 235, 0.5));
+  mix-blend-mode: multiply;
+  opacity: 0.8;
+}
+.seal-picker { display: flex; align-items: center; gap: 0.6rem 1rem; flex-wrap: wrap; }
+.seal-picker-label { font-weight: 600; }
+.seal-options { display: flex; gap: 0.45rem; flex-wrap: wrap; }
+.seal-option {
+  width: 3rem; height: 3rem; padding: 0; border-radius: 50%; cursor: pointer;
+  border: 2px solid transparent; background: transparent; display: grid; place-items: center;
+}
+.seal-option:hover { border-color: #ccc; }
+.seal-option.on { border-color: #111; }
+.seal.mini { position: relative; left: auto; top: auto; transform: none; width: 2.4rem; box-shadow: 0 0 0 2px #b9467a, inset 0 -2px 4px rgba(0, 0, 0, 0.35), 0 2px 3px rgba(60, 10, 40, 0.35); }
+.seal.mini::before { inset: 15%; border-width: 1px; }
+/* the picker shows seals in her real pink, even on the black & white writer's side */
+.admin-theme .seal.mini { filter: none; background: radial-gradient(circle at 34% 30%, #f394b8, #d0578a 52%, #9c3566); }

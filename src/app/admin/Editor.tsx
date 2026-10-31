@@ -9,6 +9,8 @@ import TextAlign from "@tiptap/extension-text-align";
 import { TextStyleKit } from "@tiptap/extension-text-style";
 import Image from "@tiptap/extension-image";
 import { deleteLetter, saveLetter } from "./actions";
+import { SEALS } from "@/lib/constants";
+import { SealEmblem } from "@/components/Envelope";
 
 type Props = {
   id?: number;
@@ -16,6 +18,7 @@ type Props = {
   content: string;
   releaseAt: string; // ISO
   isDraft: boolean;
+  seal?: string;
 };
 
 const FONTS = [
@@ -108,6 +111,7 @@ function Toolbar({ editor, onUpload, uploading }: { editor: TEditor; onUpload: (
 export default function Editor(props: Props) {
   const router = useRouter();
   const [title, setTitle] = useState(props.title);
+  const [seal, setSeal] = useState(props.seal ?? "S");
   const [release, setRelease] = useState("");
   const [msg, setMsg] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
@@ -163,7 +167,7 @@ export default function Editor(props: Props) {
     if (!editor) return;
     const releaseAt = releaseNow ? new Date().toISOString() : release ? new Date(release).toISOString() : "";
     start(async () => {
-      const res = await saveLetter({ id: props.id, title, content: editor.getHTML(), releaseAt, isDraft });
+      const res = await saveLetter({ id: props.id, title, content: editor.getHTML(), releaseAt, isDraft, seal });
       if (res.error) return setMsg(res.error);
       dirty.current = false;
       if (releaseNow) setRelease(toLocalInput(releaseAt));
@@ -187,6 +191,26 @@ export default function Editor(props: Props) {
           <span>Unlocks at (your time)</span>
           <input className="input-box" type="datetime-local" value={release} onChange={(e) => { setRelease(e.target.value); dirty.current = true; }} />
         </label>
+      </div>
+
+      <div className="seal-picker">
+        <span className="seal-picker-label">Wax seal stamp</span>
+        <div className="seal-options" role="radiogroup" aria-label="Wax seal stamp">
+          {SEALS.map((s) => (
+            <button
+              key={s.id}
+              type="button"
+              role="radio"
+              aria-checked={seal === s.id}
+              title={s.label}
+              className={`seal-option${seal === s.id ? " on" : ""}`}
+              onClick={() => { setSeal(s.id); dirty.current = true; }}
+            >
+              <span className="seal mini"><SealEmblem emblem={s.id} /></span>
+            </button>
+          ))}
+        </div>
+        <span className="help">{SEALS.find((s) => s.id === seal)?.label}</span>
       </div>
 
       <div>

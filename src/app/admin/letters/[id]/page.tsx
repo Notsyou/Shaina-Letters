@@ -33,7 +33,7 @@ export default async function EditLetter({ params }: { params: Promise<{ id: str
           </form>
         )}
       </div>
-      <Editor key={l.updatedAt.toISOString()} id={l.id} title={l.title} content={l.content} releaseAt={l.releaseAt.toISOString()} isDraft={l.isDraft} />
+      <Editor id={l.id} title={l.title} content={l.content} releaseAt={l.releaseAt.toISOString()} isDraft={l.isDraft} seal={l.seal} />
       {reps.length > 0 && (
         <div className="paper-card" style={{ marginTop: "2rem" }}>
           <h3>Her replies</h3>

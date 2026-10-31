@@ -22,7 +22,7 @@ export default async function LetterPage({ params }: { params: Promise<{ id: str
 
   const db = await getDb();
   const [meta] = await db
-    .select({ id: letters.id, isDraft: letters.isDraft, releaseAt: letters.releaseAt, firstOpenedAt: letters.firstOpenedAt })
+    .select({ id: letters.id, isDraft: letters.isDraft, releaseAt: letters.releaseAt, firstOpenedAt: letters.firstOpenedAt, seal: letters.seal })
     .from(letters)
     .where(eq(letters.id, id));
   if (!meta || (meta.isDraft && role !== "admin")) notFound();
@@ -36,7 +36,7 @@ export default async function LetterPage({ params }: { params: Promise<{ id: str
         <SiteHeader />
         <Link href="/" className="back-link">← back to all letters</Link>
         <div className="locked-view">
-          <Envelope state="locked" />
+          <Envelope state="locked" emblem={meta.seal} />
           <Countdown to={meta.releaseAt.toISOString()} big />
           <p>This one is still sealed. Come back when the timer runs out 🤍</p>
         </div>
@@ -83,6 +83,7 @@ export default async function LetterPage({ params }: { params: Promise<{ id: str
         title={letter.title}
         dateIso={letter.releaseAt.toISOString()}
         html={letter.content}
+        emblem={letter.seal}
       >
         <div className="after-letter">
           <Reactions letterId={id} active={myReactions.map((r) => r.emoji)} />

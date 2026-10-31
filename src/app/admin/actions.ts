@@ -7,6 +7,7 @@ import { checkPassword, requireAdmin, startSession } from "@/lib/auth";
 import { getDb, schema } from "@/lib/db";
 import { notifyPosted, tick } from "@/lib/notify";
 import { cleanLetterHtml } from "@/lib/sanitize";
+import { SEALS } from "@/lib/constants";
 
 const { letters, replies } = schema;
 
@@ -19,7 +20,7 @@ export async function adminLogin(_prev: string | null, form: FormData): Promise<
   redirect("/admin");
 }
 
-export type SaveInput = { id?: number; title: string; content: string; releaseAt: string; isDraft: boolean };
+export type SaveInput = { id?: number; title: string; content: string; releaseAt: string; isDraft: boolean; seal?: string };
 
 export async function saveLetter(input: SaveInput): Promise<{ id?: number; error?: string }> {
   await requireAdmin();
@@ -37,6 +38,7 @@ export async function saveLetter(input: SaveInput): Promise<{ id?: number; error
     content,
     releaseAt,
     isDraft: input.isDraft,
+    seal: SEALS.some((s) => s.id === input.seal) ? input.seal! : "S",
     updatedAt: new Date(),
     // Moved into the future (again)? Then the "ready to open" email should go out at the new time.
     ...(releaseAt > new Date() ? { releasedNotifiedAt: null } : {}),

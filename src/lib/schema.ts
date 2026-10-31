@@ -5,6 +5,7 @@ export const letters = pgTable("letters", {
   title: text("title").notNull().default(""),
   content: text("content").notNull().default(""),
   isDraft: boolean("is_draft").notNull().default(true),
+  seal: text("seal").notNull().default("S"),
   releaseAt: timestamp("release_at", { withTimezone: true }).notNull(),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),

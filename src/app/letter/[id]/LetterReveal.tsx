@@ -2,10 +2,11 @@
 
 import { useState, type ReactNode } from "react";
 import LocalDate from "@/components/LocalDate";
+import { SealEmblem } from "@/components/Envelope";
 
 type Stage = "sealed" | "opening" | "done" | "read";
 
-export default function LetterReveal(props: { alreadyOpened: boolean; title: string; dateIso: string; html: string; children: ReactNode }) {
+export default function LetterReveal(props: { alreadyOpened: boolean; title: string; dateIso: string; html: string; emblem?: string; children: ReactNode }) {
   const [stage, setStage] = useState<Stage>(props.alreadyOpened ? "read" : "sealed");
 
   function open() {
@@ -27,7 +28,7 @@ export default function LetterReveal(props: { alreadyOpened: boolean; title: str
             <div className="flap" />
           </div>
           <button type="button" className={`seal${stage === "sealed" ? " clickable" : ""}`} onClick={open} aria-label="Break the seal to open the letter">
-            <span className="emblem">S</span>
+            <SealEmblem emblem={props.emblem} />
           </button>
         </div>
         <p className="hint" style={{ visibility: stage === "sealed" ? "visible" : "hidden" }}>

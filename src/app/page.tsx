@@ -18,13 +18,13 @@ export default async function Mailbox() {
 
   // Only ids and dates for sealed letters. Their title and content never leave the server.
   const sealed = await db
-    .select({ id: letters.id, releaseAt: letters.releaseAt })
+    .select({ id: letters.id, releaseAt: letters.releaseAt, seal: letters.seal })
     .from(letters)
     .where(and(eq(letters.isDraft, false), gt(letters.releaseAt, now)))
     .orderBy(asc(letters.releaseAt));
 
   const released = await db
-    .select({ id: letters.id, title: letters.title, releaseAt: letters.releaseAt, firstOpenedAt: letters.firstOpenedAt })
+    .select({ id: letters.id, title: letters.title, releaseAt: letters.releaseAt, firstOpenedAt: letters.firstOpenedAt, seal: letters.seal })
     .from(letters)
     .where(and(eq(letters.isDraft, false), lte(letters.releaseAt, now)))
     .orderBy(desc(letters.releaseAt));
@@ -39,7 +39,7 @@ export default async function Mailbox() {
           <div className="mailbox">
             {sealed.map((l) => (
               <Link key={l.id} href={`/letter/${l.id}`} className="mail-card locked">
-                <Envelope state="locked" />
+                <Envelope state="locked" emblem={l.seal} />
                 <div className="caption">
                   <Countdown to={l.releaseAt.toISOString()} />
                 </div>
@@ -59,7 +59,7 @@ export default async function Mailbox() {
               const unread = !l.firstOpenedAt;
               return (
                 <Link key={l.id} href={`/letter/${l.id}`} className="mail-card">
-                  <Envelope state={unread ? "sealed" : "opened"} ribbon={unread ? "new" : undefined} peek={unread ? undefined : l.title} />
+                  <Envelope state={unread ? "sealed" : "opened"} emblem={l.seal} ribbon={unread ? "new" : undefined} peek={unread ? undefined : l.title} />
                   <div className="caption">
                     <div className="title">{l.title || "A letter for you"}</div>
                     <div className="date">
