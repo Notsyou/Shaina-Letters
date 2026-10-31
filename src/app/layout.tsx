@@ -7,7 +7,7 @@ export const metadata: Metadata = {
   robots: { index: false, follow: false },
 };
 
-export const viewport: Viewport = { themeColor: "#efe4cf" };
+export const viewport: Viewport = { themeColor: "#f7e6ee" };
 
 // Fonts are loaded by their real names (not next/font) so the letter editor can apply them inline.
 const FONTS =

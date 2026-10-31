@@ -25,7 +25,7 @@ const FONTS = [
   { label: "Typewriter", value: "Special Elite" },
 ];
 const SIZES = ["", "1.3rem", "2.2rem", "2.8rem"];
-const COLORS = ["#3b2a20", "#8e1b1b", "#b0476b", "#2f4f7a", "#3f6b45", "#7a5f4b"];
+const COLORS = ["#27314f", "#d0578a", "#e98bb0", "#3f6fb5", "#7fa7dc", "#8a63b8"];
 
 /** ISO → value for <input type="datetime-local"> in the writer's own time zone */
 function toLocalInput(iso: string) {

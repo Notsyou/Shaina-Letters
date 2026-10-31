@@ -26,12 +26,12 @@ export async function sendMail(opts: { to: string; subject: string; body: string
     .map((p) => `<p style="margin:0 0 14px">${escapeHtml(p).replace(/\n/g, "<br>")}</p>`)
     .join("");
   const button = opts.link
-    ? `<p style="margin:22px 0 0"><a href="${opts.link}" style="background:#8e1b1b;color:#fbf3e2;padding:10px 20px;border-radius:999px;text-decoration:none;font-family:Georgia,serif">${escapeHtml(opts.linkText || "Open")}</a></p>`
+    ? `<p style="margin:22px 0 0"><a href="${opts.link}" style="background:#d0578a;color:#fff4f8;padding:10px 20px;border-radius:999px;text-decoration:none;font-family:Georgia,serif">${escapeHtml(opts.linkText || "Open")}</a></p>`
     : "";
   const html = `
-  <div style="background:#efe4cf;padding:32px 12px">
-    <div style="max-width:520px;margin:0 auto;background:#fbf5e8;border:1px solid #d9c7a3;border-radius:6px;padding:28px 30px;font-family:Georgia,'Times New Roman',serif;color:#4a3426;font-size:16px;line-height:1.6">
-      <div style="font-size:22px;margin-bottom:16px;color:#8e1b1b">Shai's Letters 🫶🤍</div>
+  <div style="background:#f7e6ee;padding:32px 12px">
+    <div style="max-width:520px;margin:0 auto;background:#fdf5f9;border:1px solid #c9d9ef;border-radius:6px;padding:28px 30px;font-family:Georgia,'Times New Roman',serif;color:#2f3a5c;font-size:16px;line-height:1.6">
+      <div style="font-size:22px;margin-bottom:16px;color:#d0578a">Shai's Letters 🫶🤍</div>
       ${paragraphs}${button}
     </div>
   </div>`;
