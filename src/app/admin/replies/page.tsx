@@ -21,7 +21,7 @@ export default async function Replies() {
       {rows.length === 0 && <p className="empty-note">No replies yet. They&apos;ll show up here.</p>}
       <div className="past-replies">
         {rows.map(({ reply: r, title }) => (
-          <div className="past-reply" key={r.id} style={r.seenByAdmin ? undefined : { borderLeftColor: "var(--wax)", background: "#fff5ec" }}>
+          <div className="past-reply" key={r.id} style={r.seenByAdmin ? undefined : { borderLeftWidth: 6, background: "#efefef" }}>
             <div className="meta" style={{ display: "flex", justifyContent: "space-between", gap: "1rem", flexWrap: "wrap" }}>
               <span>
                 On <Link href={`/admin/letters/${r.letterId}`}>{title || "Untitled"}</Link> · <LocalDate iso={r.createdAt.toISOString()} withTime />

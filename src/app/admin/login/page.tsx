@@ -14,7 +14,7 @@ export default function AdminLogin() {
             <WaxSeal />
           </div>
         </div>
-        <h1 style={{ fontStyle: "italic", fontWeight: 500, margin: "0.8rem 0 1.4rem" }}>Writer&apos;s desk</h1>
+        <h1 style={{ fontWeight: 700, margin: "0.8rem 0 1.4rem" }}>Writer&apos;s desk</h1>
         <form action={action}>
           <input className="input-line" type="password" name="password" placeholder="admin password" autoFocus required />
           <button className="btn-wax" type="submit" disabled={pending}>{pending ? "Checking…" : "Enter"}</button>
