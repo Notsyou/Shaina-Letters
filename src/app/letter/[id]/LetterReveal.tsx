@@ -32,7 +32,7 @@ export default function LetterReveal(props: { alreadyOpened: boolean; title: str
           </button>
         </div>
         <p className="hint" style={{ visibility: stage === "sealed" ? "visible" : "hidden" }}>
-          tap the seal to open ♡
+          tap the seal to open
         </p>
       </div>
     );

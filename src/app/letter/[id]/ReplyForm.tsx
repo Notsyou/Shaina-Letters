@@ -22,11 +22,11 @@ export default function ReplyForm({ letterId }: { letterId: number }) {
 
   return (
     <form ref={formRef} action={action} onChange={() => setSent(false)}>
-      <textarea name="content" placeholder="Dear you…" maxLength={20000} required />
+      <textarea name="content" placeholder="Type here…" maxLength={20000} required />
       <div className="reply-actions">
-        <span className="form-msg">{error ?? (sent ? "Sent, sealed with a kiss 💌" : "")}</span>
+        <span className="form-msg">{error ?? (sent ? "Sent!" : "")}</span>
         <button className="btn-wax" type="submit" disabled={pending}>
-          {pending ? "Sealing…" : "Seal & send"}
+          {pending ? "Sending…" : "Send"}
         </button>
       </div>
     </form>

@@ -35,8 +35,8 @@ export async function notifyPosted(letter: Letter) {
   if (!s.notifyPosted || !s.email) return;
   await sendMail({
     to: s.email,
-    subject: "A new sealed letter has arrived 💌",
-    body: `A new letter just arrived for you, but it's still sealed.\n\nIt opens on ${formatDate(letter.releaseAt)}. 🤍`,
+    subject: "New letter for you",
+    body: `I posted a new letter for you. You can open it on ${formatDate(letter.releaseAt)}.`,
     link: siteUrl("/"),
     linkText: "See the countdown",
   });
@@ -62,8 +62,8 @@ export async function tick() {
     if (claimed.length === 0 || !s.notifyReleased || !s.email) continue;
     await sendMail({
       to: s.email,
-      subject: "A letter is ready to open 💌",
-      body: `The wax has softened… one of your letters can be opened now. 🫶`,
+      subject: "Your letter is ready",
+      body: `You can open your letter now :)`,
       link: siteUrl(`/letter/${l.id}`),
       linkText: "Open your letter",
     });

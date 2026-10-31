@@ -14,15 +14,15 @@ export default function SubscribeForm(props: { email: string; notifyPosted: bool
       <label className="check">
         <input type="checkbox" name="notifyPosted" defaultChecked={props.notifyPosted} />
         <span>
-          A new letter has been posted
-          <small>When a new sealed letter arrives, with the day it opens.</small>
+          When I post a new letter
+          <small>It tells you when it opens.</small>
         </span>
       </label>
       <label className="check">
         <input type="checkbox" name="notifyReleased" defaultChecked={props.notifyReleased} />
         <span>
-          A letter is ready to open
-          <small>The moment a countdown reaches zero.</small>
+          When a letter is ready to open
+          <small>As soon as the countdown ends.</small>
         </span>
       </label>
       <div className="reply-actions">

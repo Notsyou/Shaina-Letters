@@ -35,7 +35,7 @@ export default async function Mailbox() {
 
       {sealed.length > 0 && (
         <section className="section">
-          <h2 className="section-title">On their way…</h2>
+          <h2 className="section-title">Coming soon</h2>
           <div className="mailbox">
             {sealed.map((l) => (
               <Link key={l.id} href={`/letter/${l.id}`} className="mail-card locked">
@@ -52,7 +52,7 @@ export default async function Mailbox() {
       <section className="section">
         <h2 className="section-title">Your letters</h2>
         {released.length === 0 ? (
-          <p className="empty-note">Nothing here yet… but something is coming 🤍</p>
+          <p className="empty-note">Wala pa dito, but soon :)</p>
         ) : (
           <div className="mailbox">
             {released.map((l) => {
@@ -61,7 +61,7 @@ export default async function Mailbox() {
                 <Link key={l.id} href={`/letter/${l.id}`} className="mail-card">
                   <Envelope state={unread ? "sealed" : "opened"} emblem={l.seal} ribbon={unread ? "new" : undefined} peek={unread ? undefined : l.title} />
                   <div className="caption">
-                    <div className="title">{l.title || "A letter for you"}</div>
+                    <div className="title">{l.title || "For you"}</div>
                     <div className="date">
                       <LocalDate iso={l.releaseAt.toISOString()} />
                     </div>

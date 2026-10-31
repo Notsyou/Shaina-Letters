@@ -34,11 +34,11 @@ export default async function LetterPage({ params }: { params: Promise<{ id: str
     return (
       <main className="page">
         <SiteHeader />
-        <Link href="/" className="back-link">← back to all letters</Link>
+        <Link href="/" className="back-link">← back</Link>
         <div className="locked-view">
           <Envelope state="locked" emblem={meta.seal} />
           <Countdown to={meta.releaseAt.toISOString()} big />
-          <p>This one is still sealed. Come back when the timer runs out 🤍</p>
+          <p>This one isn't release yet baby wait ka lang konti🤍</p>
         </div>
       </main>
     );
@@ -71,7 +71,7 @@ export default async function LetterPage({ params }: { params: Promise<{ id: str
   return (
     <main className="page">
       <SiteHeader isAdmin={isAdmin} />
-      <Link href="/" className="back-link">← back to all letters</Link>
+      <Link href="/" className="back-link">← back</Link>
       {isAdmin && (locked || letter.isDraft) && (
         <p className="help" style={{ textAlign: "center" }}>
           Preview only. {letter.isDraft ? "This is a draft, so Shai can't see it." : "Shai sees a sealed envelope until it unlocks."}{" "}
@@ -88,7 +88,7 @@ export default async function LetterPage({ params }: { params: Promise<{ id: str
         <div className="after-letter">
           <Reactions letterId={id} active={myReactions.map((r) => r.emoji)} />
           <div className="paper-card reply-box">
-            <h3>Write back</h3>
+            <h3>Reply</h3>
             <ReplyForm letterId={id} />
             {myReplies.length > 0 && (
               <div className="past-replies">

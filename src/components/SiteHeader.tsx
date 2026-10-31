@@ -11,10 +11,10 @@ export default function SiteHeader({ isAdmin }: { isAdmin?: boolean }) {
       <div className="flourish">❦</div>
       <nav className="site-nav">
         <Link href="/">Letters</Link>
-        <Link href="/settings">Letter updates</Link>
+        <Link href="/settings">Email updates</Link>
         {isAdmin && <Link href="/admin">Admin</Link>}
         <form action={logout}>
-          <button type="submit">Leave</button>
+          <button type="submit">Log out</button>
         </form>
       </nav>
     </header>

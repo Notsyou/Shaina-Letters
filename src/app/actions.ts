@@ -16,7 +16,7 @@ export async function readerLogin(_prev: string | null, form: FormData): Promise
   const password = String(form.get("password") ?? "");
   if (!checkPassword(password, "reader")) {
     await wait(800);
-    return "That's not quite it… try again 🤍";
+    return "Mali po, try again";
   }
   await startSession("reader");
   redirect("/");
@@ -55,7 +55,7 @@ export async function toggleReaction(letterId: number, emoji: string) {
 
 export async function sendReply(letterId: number, _prev: string | null, form: FormData): Promise<string | null> {
   const content = String(form.get("content") ?? "").trim();
-  if (!content) return "Write something first 🤍";
+  if (!content) return "Write something first po";
   if (content.length > 20000) return "That's a very long letter! Please keep it under 20,000 characters.";
   const { db, letter, role } = await assertOpenable(letterId);
   await db.insert(replies).values({ letterId, content, seenByAdmin: role === "admin" });
@@ -76,7 +76,7 @@ export async function saveSubscription(_prev: string | null, form: FormData): Pr
   const notifyPosted = form.get("notifyPosted") === "on";
   const notifyReleased = form.get("notifyReleased") === "on";
   if ((notifyPosted || notifyReleased) && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-    return "Please enter a valid email so I know where to send them.";
+    return "Please enter a valid email.";
   }
   const db = await getDb();
   await db
@@ -84,5 +84,5 @@ export async function saveSubscription(_prev: string | null, form: FormData): Pr
     .values({ id: 1, email, notifyPosted, notifyReleased })
     .onConflictDoUpdate({ target: settings.id, set: { email, notifyPosted, notifyReleased } });
   revalidatePath("/settings");
-  return "Saved! 🤍";
+  return "Saved!";
 }

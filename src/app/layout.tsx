@@ -3,7 +3,7 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: "Shai's Letters 🫶🤍",
-  description: "Letters, sealed with love.",
+  description: "Letters for Shai",
   robots: { index: false, follow: false },
 };
 

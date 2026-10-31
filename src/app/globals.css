@@ -323,7 +323,7 @@ button { font: inherit; color: inherit; }
 .login-inner { width: min(460px, 100%); text-align: center; }
 .login .envelope { margin: 2.2rem 0 2.4rem; }
 .login form { display: grid; gap: 1.4rem; justify-items: center; }
-.login .input-line { text-align: center; max-width: 300px; }
+.login .input-line { text-align: center; max-width: 340px; font-size: 1.45rem; }
 .login .site-title { font-size: clamp(2rem, 9vw, 3.2rem); white-space: nowrap; }
 .login .subtitle { font-family: var(--font-hand); font-size: 1.6rem; color: var(--ink-soft); margin: 0; }
 .login.shake .envelope { animation: shake 0.45s; }

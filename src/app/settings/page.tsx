@@ -10,10 +10,10 @@ export default async function SettingsPage() {
   return (
     <main className="page">
       <SiteHeader isAdmin={role === "admin"} />
-      <Link href="/" className="back-link">← back to all letters</Link>
+      <Link href="/" className="back-link">← back</Link>
       <div className="paper-card" style={{ maxWidth: 560, margin: "0 auto" }}>
-        <h3>Letter updates 💌</h3>
-        <p className="help" style={{ marginTop: 0 }}>Want a little note in your inbox? Pick what you&apos;d like to hear about. You can turn it off any time.</p>
+        <h3>Email updates</h3>
+        <p className="help" style={{ marginTop: 0 }}>Get an email when there&apos;s a new letter. You can turn this off anytime.</p>
         <SubscribeForm email={s.email} notifyPosted={s.notifyPosted} notifyReleased={s.notifyReleased} />
       </div>
     </main>

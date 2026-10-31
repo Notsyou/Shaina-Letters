@@ -21,12 +21,12 @@ export default function LoginForm() {
       <div className="login-inner">
         <h1 className="site-title">{SITE_TITLE}</h1>
         <div className="flourish">❦</div>
-        <p className="subtitle">some words, sealed just for you</p>
+        <p className="subtitle">Hi baby :) Welcome to plan B</p>
         <Envelope state="sealed" />
         <form action={action}>
-          <input className="input-line" type="password" name="password" placeholder="the secret word…" autoComplete="current-password" required autoFocus />
+          <input className="input-line" type="password" name="password" placeholder="Enter ur fav line po when I say psst" autoComplete="current-password" required autoFocus />
           <button className="btn-wax" type="submit" disabled={pending}>
-            {pending ? "Opening…" : "Break the seal"}
+            {pending ? "Opening…" : "Proceed"}
           </button>
           {error && <div className="form-msg">{error}</div>}
         </form>

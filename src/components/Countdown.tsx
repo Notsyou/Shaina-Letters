@@ -30,7 +30,7 @@ export default function Countdown({ to, big }: { to: string; big?: boolean }) {
   }, [left !== null && left <= 0, router]); // eslint-disable-line react-hooks/exhaustive-deps
 
   if (left === null) return <span className={`countdown${big ? " big" : ""}`} aria-hidden>&nbsp;</span>;
-  if (left <= 0) return <span className={`countdown${big ? " big" : ""}`}>✨ ready ✨</span>;
+  if (left <= 0) return <span className={`countdown${big ? " big" : ""}`}>ready na!</span>;
 
   const p = parts(left);
   const units: [string, string][] = [
