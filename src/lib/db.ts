@@ -53,7 +53,8 @@ async function connect(): Promise<{ db: DB; exec: RawExec; query: RawQuery }> {
     const { Pool } = await import("pg");
     const pool = new Pool({
       connectionString: url,
-      ssl: /localhost|127\.0\.0\.1/.test(url) ? undefined : { rejectUnauthorized: false },
+      // Neon URLs carry sslmode=require (TLS with certificate checks); only add TLS if the URL doesn't say.
+      ssl: /sslmode=|localhost|127\.0\.0\.1/.test(url) ? undefined : true,
       max: 5,
     });
     return {
