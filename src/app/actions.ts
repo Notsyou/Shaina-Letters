@@ -16,7 +16,7 @@ export async function readerLogin(_prev: string | null, form: FormData): Promise
   const password = String(form.get("password") ?? "");
   if (!checkPassword(password, "reader")) {
     await wait(800);
-    return "Mali po, try again";
+    return "Mali po, infinite tries naman to dw";
   }
   await startSession("reader");
   redirect("/");

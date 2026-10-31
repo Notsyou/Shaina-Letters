@@ -159,11 +159,15 @@ button { font: inherit; color: inherit; }
 /* ───────── Mailbox grid ───────── */
 .mailbox { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 2.6rem 2.2rem; }
 @media (max-width: 560px) {
-  .mailbox { grid-template-columns: 1fr 1fr; gap: 1.8rem 1.1rem; }
+  .mailbox { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1.8rem 1rem; }
   .mail-card .caption .title { font-size: 1.3rem; }
-  .countdown { gap: 0.25em; }
-  .countdown .num { font-size: 1.05rem; }
-  .countdown .unit { min-width: 1.8em; }
+  .countdown { gap: 0.2em; }
+  .countdown .num { font-size: 1rem; }
+  .countdown .unit { min-width: 1.6em; }
+  .countdown .lbl { font-size: 0.7rem; }
+  .mail-card .countdown { gap: 0.5em; }
+  .mail-card .countdown .num { font-size: 1.1rem; }
+  .mail-card .countdown .unit:last-child { display: none; } /* seconds: shown on the letter page itself */
   .ribbon { font-size: 0.95rem; }
 }
 .mail-card { display: block; text-decoration: none; color: inherit; transition: transform 0.35s ease; }
@@ -319,7 +323,7 @@ button { font: inherit; color: inherit; }
 .check small { display: block; color: var(--ink-soft); font-style: italic; font-size: 0.95rem; }
 
 /* ───────── Login ───────── */
-.login { min-height: 100vh; display: grid; place-items: center; padding: 2rem 1.25rem; }
+.login { min-height: 100vh; min-height: 100svh; display: grid; place-items: center; padding: 2rem 1.25rem; }
 .login-inner { width: min(460px, 100%); text-align: center; }
 .login .envelope { margin: 2.2rem 0 2.4rem; }
 .login form { display: grid; gap: 1.4rem; justify-items: center; }
@@ -350,7 +354,8 @@ button { font: inherit; color: inherit; }
 .badge.opened { color: var(--wax); border-color: #eeb0c8; background: #fde7f0; }
 .dot { display: inline-block; min-width: 1.4rem; padding: 0 0.4rem; border-radius: 999px; background: var(--wax); color: #fff; font-size: 0.8rem; text-align: center; margin-left: 0.3rem; font-style: normal; }
 
-.editor-grid { display: grid; grid-template-columns: 1fr; gap: 1.2rem; }
+.editor-grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: 1.2rem; }
+.editor-grid > * { min-width: 0; }
 .editor-meta { display: grid; grid-template-columns: 1fr 260px; gap: 1rem 1.4rem; align-items: end; }
 @media (max-width: 640px) { .editor-meta { grid-template-columns: 1fr; } }
 .input-box { width: 100%; padding: 0.6rem 0.8rem; border: 1px solid rgba(93, 106, 150, 0.45); border-radius: 6px; background: #fffafd; font: inherit; color: var(--ink); }
@@ -461,3 +466,47 @@ button { font: inherit; color: inherit; }
 .seal.mini::before { inset: 15%; border-width: 1px; }
 /* the picker shows seals in her real pink, even on the black & white writer's side */
 .admin-theme .seal.mini { filter: none; background: radial-gradient(circle at 34% 30%, #f394b8, #d0578a 52%, #9c3566); }
+
+
+/* ───────── Phones ───────── */
+@media (max-width: 560px) {
+  body { font-size: 1.05rem; }
+  .page { padding: 1.6rem 1rem 3.5rem; }
+  .site-header { margin-bottom: 1.8rem; }
+  .site-nav { gap: 1.1rem; font-size: 1rem; }
+  .section-title { font-size: 1.45rem; }
+  .section + .section { margin-top: 2.6rem; }
+  .back-link { margin-bottom: 1rem; }
+
+  /* letter */
+  :root { --lh: 2rem; }
+  .letter-body { font-size: 1.5rem; }
+  .letter-title { font-size: 2rem; }
+  .letter-body h2 { font-size: 1.8rem; }
+  .letter-body h3 { font-size: 1.6rem; }
+  .letter-paper { padding-right: 1.1rem; }
+  .letter-body img { max-width: 100%; padding: 8px 8px 28px; }
+  .reactions { gap: 0.4rem; flex-wrap: nowrap; }
+  .reaction { width: 2.6rem; height: 2.6rem; font-size: 1.25rem; }
+  .paper-card { padding: 1.2rem 1.1rem; }
+  .reply-box { margin-top: 1.8rem; }
+  .locked-view p { font-size: 1.4rem; }
+  .reveal-stage .hint { font-size: 1.4rem; }
+
+  /* stop iPhones from zooming into text boxes (needs >= 16px) */
+  input, textarea, select { font-size: max(16px, 1em); }
+
+  /* writer's side */
+  .admin { padding: 1rem 0.9rem 4rem; }
+  .admin-bar { gap: 0.7rem; margin-bottom: 1.2rem; }
+  .admin-bar h1, .admin-theme .admin-bar h1 { font-size: 1.35rem; }
+  .admin-bar nav { gap: 0.4rem; }
+  .admin-bar nav .btn-plain, .admin-bar nav .btn-wax { padding: 0.35rem 0.8rem; font-size: 0.9rem; }
+  .admin-row { padding: 0.8rem 0.9rem; }
+  .toolbar { flex-wrap: nowrap; overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: thin; }
+  .toolbar > * { flex: none; }
+  .editor-surface .letter-paper { min-height: 300px; padding-left: 2.4rem; }
+  .seal-option { width: 2.6rem; height: 2.6rem; }
+  .seal.mini { width: 2.1rem; }
+  .editor-actions .left, .editor-actions .right { width: 100%; }
+}

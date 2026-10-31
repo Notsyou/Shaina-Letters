@@ -13,7 +13,7 @@ export default async function SettingsPage() {
       <Link href="/" className="back-link">← back</Link>
       <div className="paper-card" style={{ maxWidth: 560, margin: "0 auto" }}>
         <h3>Email updates</h3>
-        <p className="help" style={{ marginTop: 0 }}>Get an email when there&apos;s a new letter. You can turn this off anytime.</p>
+        <p className="help" style={{ marginTop: 0 }}>Get an email when there&apos;s a new letter. You can turn this off anytime btw.</p>
         <SubscribeForm email={s.email} notifyPosted={s.notifyPosted} notifyReleased={s.notifyReleased} />
       </div>
     </main>

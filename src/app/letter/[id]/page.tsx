@@ -38,7 +38,7 @@ export default async function LetterPage({ params }: { params: Promise<{ id: str
         <div className="locked-view">
           <Envelope state="locked" emblem={meta.seal} />
           <Countdown to={meta.releaseAt.toISOString()} big />
-          <p>This one isn't release yet baby wait ka lang konti🤍</p>
+          <p>This one isn't released yet baby wait ka lang konti🤍</p>
         </div>
       </main>
     );
